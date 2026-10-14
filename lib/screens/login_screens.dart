@@ -10,6 +10,7 @@ class LoginScreens extends StatefulWidget {
 }
 
 class _LoginScreensState extends State<LoginScreens> {
+  bool _isObscure= true; 
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -22,7 +23,44 @@ class _LoginScreensState extends State<LoginScreens> {
               SizedBox(
                 width: screenSize.width,
                 height: 200,
-                child: RiveAnimation.asset('assets/login-bear-animation.riv')),
+                child: RiveAnimation.asset('assets/login-bear-animation.riv')
+              ),
+              SizedBox(height: 10,),
+              //Email
+              TextField(
+                decoration: InputDecoration(
+                  hintText: "E-mail", 
+                  prefixIcon: const Icon(Icons.email),
+                  border: OutlineInputBorder(
+                    //Para redondear bordes
+                    borderRadius: BorderRadius.circular(12)
+                  )
+                ),
+              ),
+              const SizedBox(height: 10),
+              //Contraseña
+              TextField(
+                obscureText: _isObscure,
+                decoration: InputDecoration(
+                  hintText: "Contraseña", 
+                  prefixIcon: const Icon(Icons.lock),
+                  suffixIcon: IconButton(
+                  onPressed: (){
+                    //Refrescar el icono
+                    setState(() {
+                      _isObscure = !_isObscure;
+                    });
+                  }, 
+                  icon: Icon(
+                    //If ternario
+                    _isObscure ? Icons.visibility : Icons.visibility_off
+                  )),
+                  border: OutlineInputBorder(
+                    //Para redondear bordes
+                    borderRadius: BorderRadius.circular(12)
+                  )
+                ),
+              ),
             ],
           ),
         ))
