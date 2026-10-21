@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
+import 'dart:async'; 
 
 class LoginScreens extends StatefulWidget {
   const new({super.key});
@@ -21,6 +22,29 @@ class _LoginScreensState extends State<LoginScreens> {
   SMITrigger? _trigFail;
   SMINumber? _numLook; 
 
+  Timer? _typingDebounce; 
+
+
+  final _emailFocus = FocusNode(); 
+  final _passwordFocus = FocusNode(); 
+
+  @override
+  void initState() {
+
+    super.initState(); 
+    _emailFocus.addListener(() {
+      
+      if (_emailFocus.hasFocus){
+        if (_isHandsUp != null){
+          _isHandsUp?.change(false);
+          _numLook?.value = 50.0;
+        }
+      }
+    });
+    _passwordFocus.addListener(() {
+      _isHandsUp?.change(_passwordFocus.hasFocus);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -52,13 +76,22 @@ class _LoginScreensState extends State<LoginScreens> {
                 SizedBox(height: 10,),
                 //Email
                 TextField(
+                  focusNode: _emailFocus,
                   onChanged:(value) {
                     if (_isHandsUp != null){
-                      _isHandsUp!.change(false);
+                    //  _isHandsUp!.change(false);
                     }
 
                     if (_isChecking == null) return;
                     _isChecking!.change(true);
+                    final look = (value.length / 80.0*100.0).clamp(0.0, 100.0);
+                    _numLook?.value = look;
+
+                    _typingDebounce?.cancel();
+                    _typingDebounce = Timer(const Duration(seconds: 3), (){
+                      if (!mounted) return; 
+                      _isChecking?.change(false); 
+                    });
                   },
                   decoration: InputDecoration(
                     hintText: "E-mail", 
@@ -72,9 +105,10 @@ class _LoginScreensState extends State<LoginScreens> {
                 const SizedBox(height: 10),
                 //Contraseña
                 TextField(
+                    focusNode: _passwordFocus,
                     onChanged:(value) {
                     if (_isChecking != null){
-                      _isChecking!.change(false);
+                      //_isChecking!.change(false);
                     }
 
                     if (_isHandsUp == null) return;
@@ -106,5 +140,13 @@ class _LoginScreensState extends State<LoginScreens> {
           )),
       )
     );
+  }
+  @override
+  void dispose() {
+    // Liberar memoria en los focusNode 
+    _emailFocus.dispose();
+    _passwordFocus.dispose(); 
+    _typingDebounce?.cancel();
+    super.dispose();
   }
 }
