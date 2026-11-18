@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:login_bear/screens/products_screen.dart';
 import 'package:rive/rive.dart';
-import 'dart:async'; 
+import 'dart:async';
 
 class LoginScreens extends StatefulWidget {
-  const new({super.key});
+  const LoginScreens({super.key});
 
   
   @override
@@ -48,7 +50,7 @@ class _LoginScreensState extends State<LoginScreens> {
     return re.hasMatch(pass);
   }
 
-  void _onLogin(){
+  Future<void> _onLogin() async {
     final email = emailCtrl.text.trim(); 
     final pass = passCtrl.text; 
     final emailTypedError = isValidEmail(email)? null : 'Email inválido'; 
@@ -65,11 +67,28 @@ class _LoginScreensState extends State<LoginScreens> {
     _isHandsUp?.change(false); 
     _numLook?.value = 50.0;
 
-    if (emailTypedError == null && passTypedError == null){
-      _trigSuccess?.fire(); 
-    } else {
-      _trigFail?.fire(); 
+    if (emailTypedError != null || passTypedError != null) {
+      _trigFail?.fire();
+      return;
     }
+
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: pass);
+    } on FirebaseAuthException catch (e) {
+      // Credenciales que cumplen el regex pero Firebase rechaza: sin error por campo.
+      _trigFail?.fire();
+      debugPrint('Firebase login falló: ${e.code}');
+      return;
+    }
+
+    _trigSuccess?.fire();
+    // Dejar que la animación de éxito se vea antes de navegar.
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const ProductsScreen()),
+    );
   }
 
 
@@ -192,7 +211,7 @@ class _LoginScreensState extends State<LoginScreens> {
                   style: TextStyle(decoration: TextDecoration.underline),
                   ),
 
-                )
+                ),
                 const SizedBox(height:10),
                 MaterialButton(
                   minWidth: screenSize.width,
