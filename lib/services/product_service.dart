@@ -10,12 +10,14 @@ class Product {
   final String name;
   final double price;
   final int stock;
+  final String category;
 
   const Product({
     required this.id,
     required this.name,
     required this.price,
     required this.stock,
+    required this.category,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
@@ -23,6 +25,8 @@ class Product {
         name: json['name'] as String,
         price: (json['price'] as num).toDouble(),
         stock: json['stock'] as int,
+        // equivale a product['category']['category'] del JSON
+        category: (json['category'] as Map<String, dynamic>?)?['category'] as String? ?? 'Sin categoría',
       );
 }
 
