@@ -23,3 +23,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+  fonts:
+    - family: Anton
+      fonts:
+        - asset: assets/fonts/Anton-Regular.ttf
