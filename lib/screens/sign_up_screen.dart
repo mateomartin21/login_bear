@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:login_bear/utils/validators.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  const SignUpScreen({super.key, this.auth});
+  final FirebaseAuth? auth;
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -19,12 +20,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   // En registro sí se permiten mensajes específicos (OWASP: solo el login es genérico).
   String _messageFor(String code) => switch (code) {
-        'email-already-in-use' => 'Este correo ya está registrado',
-        'weak-password' => 'La contraseña es demasiado débil',
-        'invalid-email' => 'Correo inválido',
-        'network-request-failed' => 'Sin conexión a internet',
-        _ => 'No se pudo crear la cuenta, intenta de nuevo',
-      };
+    'email-already-in-use' => 'Este correo ya está registrado',
+    'weak-password' => 'La contraseña es demasiado débil',
+    'invalid-email' => 'Correo inválido',
+    'network-request-failed' => 'Sin conexión a internet',
+    _ => 'No se pudo crear la cuenta, intenta de nuevo',
+  };
 
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
@@ -32,12 +33,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final navigator = Navigator.of(context);
     setState(() => _loading = true);
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      final auth = widget.auth ?? FirebaseAuth.instance;
+      await auth.createUserWithEmailAndPassword(
         email: _emailCtrl.text.trim(),
         password: _passCtrl.text,
       );
       // createUser deja la sesión abierta; se cierra para que entre desde el Login.
-      await FirebaseAuth.instance.signOut();
+      await auth.signOut();
       messenger.showSnackBar(
         const SnackBar(content: Text('Cuenta creada. Ahora inicia sesión')),
       );
@@ -92,18 +94,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Icons.lock,
                   suffix: IconButton(
                     onPressed: () => setState(() => _obscure = !_obscure),
-                    icon: Icon(_obscure ? Icons.visibility : Icons.visibility_off),
+                    icon: Icon(
+                      _obscure ? Icons.visibility : Icons.visibility_off,
+                    ),
                   ),
                 ),
-                validator: (v) => isStrongPassword(v ?? '')
-                    ? null
-                    : 'Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo',
+                validator: (v) => isStrongPassword(v ?? '') ? null : 'Mínimo 8 caracteres, con mayúscula, minúscula, número y símbolo',
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _confirmCtrl,
                 obscureText: _obscure,
-                decoration: _decoration('Confirmar contraseña', Icons.lock_outline),
+                decoration: _decoration(
+                  'Confirmar contraseña',
+                  Icons.lock_outline,
+                ),
                 validator: (v) =>
                     v == _passCtrl.text ? null : 'Las contraseñas no coinciden',
               ),
@@ -115,23 +120,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   '• Mínimo 8 caracteres\n'
                   '• Una mayúscula y una minúscula\n'
                   '• Un número y un símbolo',
-                  style: TextStyle(color: Colors.black54),
                 ),
               ),
               const SizedBox(height: 20),
               MaterialButton(
                 minWidth: double.infinity,
                 height: 50,
-                color: Colors.pinkAccent,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                color: Theme.of(context).colorScheme.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 onPressed: _loading ? null : _signUp,
                 child: _loading
                     ? const SizedBox(
                         height: 24,
                         width: 24,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2.5,
+                        ),
                       )
-                    : const Text('Sign up', style: TextStyle(color: Colors.white, fontSize: 18)),
+                    : Text(
+                        'Crear cuenta',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onPrimary,
+                          fontSize: 18,
+                        ),
+                      ),
               ),
             ],
           ),

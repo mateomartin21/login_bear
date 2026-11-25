@@ -10,9 +10,12 @@ import 'screens/login_screens.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   const local = bool.fromEnvironment('MUSEUM_AUTH_EMULATOR');
-  var ready = false;
+  final androidDemo =
+      local && !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+  FirebaseAuth? auth;
   try {
-    await Firebase.initializeApp(
+    final app = await Firebase.initializeApp(
+      name: androidDemo ? 'nocturna-demo' : null,
       options: local
           ? const FirebaseOptions(
               apiKey: 'local-demo-key',
@@ -29,31 +32,35 @@ Future<void> main() async {
             )
           : null,
     );
+    final museumAuth = FirebaseAuth.instanceFor(app: app);
     if (local) {
-      final host = !kIsWeb && defaultTargetPlatform == TargetPlatform.android
-          ? '10.0.2.2'
-          : '127.0.0.1';
-      await FirebaseAuth.instance.useAuthEmulator(host, 9099);
+      await museumAuth.useAuthEmulator(
+        androidDemo ? '10.0.2.2' : '127.0.0.1',
+        9099,
+      );
     }
-    ready = true;
+    auth = museumAuth;
+  } on FirebaseException catch (error) {
+    debugPrint('No se pudo iniciar Firebase: ${error.code}');
   } on Exception catch (error) {
     debugPrint('No se pudo iniciar Firebase: ${error.runtimeType}');
   }
-  runApp(NightMuseum(ready: ready));
+  runApp(NightMuseum(auth: auth));
 }
 
 class NightMuseum extends StatelessWidget {
-  const NightMuseum({required this.ready, super.key});
+  const NightMuseum({required this.auth, super.key});
 
-  final bool ready;
+  final FirebaseAuth? auth;
 
-  Widget _login(BuildContext context) => LoginScreens(destination: _gallery);
+  Widget _login(BuildContext context) =>
+      LoginScreens(destination: _gallery, auth: auth);
 
   Widget _gallery(BuildContext context) => Gallery(
     onExit: () async {
       final navigator = Navigator.of(context);
       try {
-        await FirebaseAuth.instance.signOut();
+        await auth!.signOut();
         if (!navigator.mounted) return;
         navigator.pushAndRemoveUntil(
           MaterialPageRoute(builder: _login),
@@ -72,7 +79,7 @@ class NightMuseum extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-    title: 'Museo nocturno',
+    title: 'Nocturna · Galería de arte',
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
       colorScheme: const ColorScheme.dark(
@@ -83,18 +90,42 @@ class NightMuseum extends StatelessWidget {
         outline: Color(0xff85796a),
       ),
       scaffoldBackgroundColor: const Color(0xff090909),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xff090909),
+        titleTextStyle: TextStyle(
+          fontFamily: 'Anton',
+          fontSize: 24,
+          color: Colors.white,
+        ),
+      ),
+      inputDecorationTheme: const InputDecorationTheme(
+        filled: true,
+        fillColor: Color(0xff202023),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(minimumSize: const Size(48, 48)),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: const Color(0xff151517),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? Colors.black
+                : Colors.white70,
+          ),
+        ),
+      ),
       textTheme: const TextTheme(
         displaySmall: TextStyle(fontFamily: 'Anton', fontSize: 38),
       ),
     ),
-    home: !ready
+    home: auth == null
         ? const Scaffold(
             body: Center(child: Text('No se pudo conectar con Firebase.')),
           )
         : Builder(
-            builder: (context) => FirebaseAuth.instance.currentUser == null
-                ? _login(context)
-                : _gallery(context),
+            builder: (context) =>
+                auth!.currentUser == null ? _login(context) : _gallery(context),
           ),
   );
 }

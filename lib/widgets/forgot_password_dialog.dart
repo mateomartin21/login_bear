@@ -1,15 +1,21 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-Future<void> showForgotPasswordDialog(BuildContext context, String initialEmail) {
+Future<void> showForgotPasswordDialog(
+  BuildContext context,
+  String initialEmail, {
+  FirebaseAuth? auth,
+}) {
   return showDialog<void>(
     context: context,
-    builder: (_) => _ForgotPasswordDialog(initialEmail: initialEmail),
+    builder: (_) =>
+        _ForgotPasswordDialog(initialEmail: initialEmail, auth: auth),
   );
 }
 
 class _ForgotPasswordDialog extends StatefulWidget {
-  const _ForgotPasswordDialog({required this.initialEmail});
+  const _ForgotPasswordDialog({required this.initialEmail, this.auth});
+  final FirebaseAuth? auth;
   final String initialEmail;
 
   @override
@@ -25,25 +31,37 @@ class _ForgotPasswordDialogState extends State<_ForgotPasswordDialog> {
     final messenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
     if (email.isEmpty) {
-      messenger.showSnackBar(const SnackBar(content: Text('Ingresa tu correo')));
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Ingresa tu correo')),
+      );
       return;
     }
     setState(() => _sending = true);
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      await (widget.auth ?? FirebaseAuth.instance).sendPasswordResetEmail(
+        email: email,
+      );
       navigator.pop();
       // Mensaje neutro: Firebase no revela si el correo existe (anti-enumeración).
-      messenger.showSnackBar(const SnackBar(
-        content: Text('Si el correo está registrado, recibirás un enlace para restablecer tu contraseña'),
-      ));
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Si el correo está registrado, recibirás un enlace para restablecer tu contraseña',
+          ),
+        ),
+      );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       setState(() => _sending = false);
-      messenger.showSnackBar(SnackBar(
-        content: Text(e.code == 'invalid-email'
-            ? 'Correo inválido'
-            : 'No se pudo enviar el correo, intenta de nuevo'),
-      ));
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            e.code == 'invalid-email'
+                ? 'Correo inválido'
+                : 'No se pudo enviar el correo, intenta de nuevo',
+          ),
+        ),
+      );
     }
   }
 

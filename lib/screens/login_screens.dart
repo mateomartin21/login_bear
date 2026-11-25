@@ -8,7 +8,8 @@ import 'package:login_bear/widgets/forgot_password_dialog.dart';
 import 'package:rive/rive.dart';
 
 class LoginScreens extends StatefulWidget {
-  const LoginScreens({super.key, this.destination});
+  const LoginScreens({super.key, this.destination, this.auth});
+  final FirebaseAuth? auth;
 
   final WidgetBuilder? destination;
 
@@ -20,14 +21,13 @@ class _LoginScreensState extends State<LoginScreens> {
   bool _isObscure = true;
   bool _loading = false;
 
-  //  1.1 Maquina estados / Cerebro de la animación
-  StateMachineController? _controller;
-  // StateMachineInput
   SMIBool? _isChecking;
   SMIBool? _isHandsUp;
   SMITrigger? _trigSuccess;
   SMITrigger? _trigFail;
   SMINumber? _numLook;
+  SMIBool? _isSubmitting;
+  Completer<void>? _welcome;
 
   Timer? _typingDebounce;
 
@@ -36,17 +36,46 @@ class _LoginScreensState extends State<LoginScreens> {
 
   final emailCtrl = TextEditingController();
   final passCtrl = TextEditingController();
+  bool get _museum => widget.destination != null;
+
+  void _bindAnimation(Artboard artboard) {
+    final controller = StateMachineController.fromArtboard(
+      artboard,
+      'Login Machine',
+    );
+    if (controller == null) return;
+    artboard.addController(controller);
+    _isChecking = controller.getBoolInput('isChecking');
+    _isHandsUp = controller.getBoolInput('isHandsUp');
+    _trigSuccess = controller.getTriggerInput('trigSuccess');
+    _trigFail = controller.getTriggerInput('trigFail');
+    _numLook = controller.getNumberInput('numLook');
+    _isSubmitting = controller.getBoolInput('isSubmitting');
+    _isChecking?.change(_emailFocus.hasFocus);
+    _isHandsUp?.change(_passwordFocus.hasFocus);
+    _isSubmitting?.change(_loading);
+    controller.addEventListener((event) {
+      final welcome = _welcome;
+      if (event.name == 'loginSuccessComplete' &&
+          welcome != null &&
+          !welcome.isCompleted) {
+        welcome.complete();
+      }
+    });
+  }
 
   // OWASP A07: un único mensaje global, sin decir qué campo falló.
   void _fail(String message) {
     if (!mounted) return;
     setState(() => _loading = false);
+    _isSubmitting?.change(false);
     _trigFail?.fire();
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _onLogin() async {
+    if (_loading) return;
     final email = emailCtrl.text.trim();
     final pass = passCtrl.text;
 
@@ -64,8 +93,9 @@ class _LoginScreensState extends State<LoginScreens> {
     }
 
     setState(() => _loading = true);
+    _isSubmitting?.change(true);
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await (widget.auth ?? FirebaseAuth.instance).signInWithEmailAndPassword(
         email: email,
         password: pass,
       );
@@ -81,9 +111,16 @@ class _LoginScreensState extends State<LoginScreens> {
 
     if (!mounted) return;
     emailCtrl.clear();
-    _trigSuccess?.fire();
-    // Dejar que la animación de éxito se vea antes de navegar.
-    await Future.delayed(const Duration(seconds: 2));
+    _isSubmitting?.change(false);
+    if (!MediaQuery.disableAnimationsOf(context)) {
+      final welcome = _welcome = Completer<void>();
+      _trigSuccess?.fire();
+      // A missing asset or a paused tab must never block an authenticated session.
+      await welcome.future.timeout(
+        Duration(milliseconds: _museum ? 1150 : 2000),
+        onTimeout: () {},
+      );
+    }
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
@@ -96,6 +133,7 @@ class _LoginScreensState extends State<LoginScreens> {
   void initState() {
     super.initState();
     _emailFocus.addListener(() {
+      _isChecking?.change(_emailFocus.hasFocus);
       if (_emailFocus.hasFocus) {
         if (_isHandsUp != null) {
           _isHandsUp?.change(false);
@@ -111,8 +149,9 @@ class _LoginScreensState extends State<LoginScreens> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    final museum = widget.destination != null;
+    final museum = _museum;
     final colors = Theme.of(context).colorScheme;
+    final reduceMotion = MediaQuery.disableAnimationsOf(context);
     return Scaffold(
       body: Center(
         child: ConstrainedBox(
@@ -124,32 +163,33 @@ class _LoginScreensState extends State<LoginScreens> {
                 child: Column(
                   children: [
                     if (museum) ...[
-                      Text(
-                        'Museo nocturno',
+                      Text.rich(
+                        const TextSpan(
+                          text: 'NOCTURNA ',
+                          children: [
+                            TextSpan(
+                              text: '//',
+                              style: TextStyle(color: Color(0xffff665e)),
+                            ),
+                          ],
+                        ),
                         style: Theme.of(context).textTheme.displaySmall,
                       ),
                       const SizedBox(height: 8),
-                      const Text('Inicia sesión para entrar a la galería.'),
+                      const Text('Entra al taller y explora la colección.'),
+                      const SizedBox(height: 12),
                     ],
                     SizedBox(
                       width: screenSize.width,
-                      height: 200,
+                      height: museum ? 218 : 200,
                       child: RiveAnimation.asset(
-                        'assets/login-bear-animation.riv',
-                        stateMachines: ['Login Machine'],
-                        //1.2 Vincular la animación
+                        museum
+                            ? 'assets/nocturna-painter.riv'
+                            : 'assets/login-bear-animation.riv',
+                        key: ValueKey(reduceMotion),
+                        useArtboardSize: false,
                         onInit: (artboard) {
-                          _controller = StateMachineController.fromArtboard(
-                            artboard,
-                            'Login Machine',
-                          );
-                          if (_controller == null) return;
-                          artboard.addController(_controller!);
-                          _isChecking = _controller!.findSMI('isChecking');
-                          _isHandsUp = _controller!.findSMI('isHandsUp');
-                          _trigSuccess = _controller!.findSMI('trigSuccess');
-                          _trigFail = _controller!.findSMI('trigFail');
-                          _numLook = _controller!.findSMI('numLook');
+                          if (!reduceMotion) _bindAnimation(artboard);
                         },
                       ),
                     ),
@@ -227,6 +267,7 @@ class _LoginScreensState extends State<LoginScreens> {
                         onTap: () => showForgotPasswordDialog(
                           context,
                           emailCtrl.text.trim(),
+                          auth: widget.auth,
                         ),
                         child: Text(
                           museum
@@ -280,7 +321,8 @@ class _LoginScreensState extends State<LoginScreens> {
                                 ? null
                                 : () => Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (_) => const SignUpScreen(),
+                                      builder: (_) =>
+                                          SignUpScreen(auth: widget.auth),
                                     ),
                                   ),
                             child: Text(
