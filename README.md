@@ -2,6 +2,16 @@
 
 Nocturna es una galería de arte en Flutter con inicio de sesión mediante Firebase Auth y un catálogo servido por Spring Boot. El recorrido empieza con un pintor interactivo en Rive y continúa con doce obras de [The Met Open Access](https://www.metmuseum.org/hubs/open-access).
 
+## Capturas en Android
+
+| Inicio de sesión | Explorar |
+| :---: | :---: |
+| <img src="docs/capturas/01-login.png" width="240" alt="Inicio de sesión de Nocturna con el pintor de Rive"> | <img src="docs/capturas/02-explorar.png" width="240" alt="Galería con La gran ola de Kanagawa y acceso a los recorridos guiados"> |
+
+| Ficha del recorrido | Boleto de visita |
+| :---: | :---: |
+| <img src="docs/capturas/03-recorrido.png" width="240" alt="Ficha de la primera obra con el botón Paradas y los modos Original y Trama"> | <img src="docs/capturas/04-boleto.png" width="240" alt="Boleto que se puede desprender al completar el recorrido"> |
+
 ## Ejecutar la demo
 
 Necesitas Flutter, Dart 3.13.4 o compatible, Java 21, Maven y Node.js. Para Android también necesitas un dispositivo virtual configurado en Android Studio. Si preparas Firebase desde cero, coloca el archivo de tu proyecto Android en `android/app/google-services.json` en tu copia local.
