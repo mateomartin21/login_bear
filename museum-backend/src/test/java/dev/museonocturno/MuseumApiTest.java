@@ -22,7 +22,15 @@ class MuseumApiTest {
     void createsReordersAndDeletesAnExhibition() throws Exception {
         var catalog = request("GET", "artworks", null);
         assertEquals(200, catalog.statusCode());
-        assertTrue(json.readTree(catalog.body()).size() >= 3);
+        var works = json.readTree(catalog.body());
+        assertEquals(12, works.size());
+        for (var work : works) {
+            assertEquals("https", URI.create(work.get("imageUrl").asString()).getScheme());
+            assertEquals("assets/met-" + work.get("id").asInt() + ".jpg",
+                    work.get("imageAsset").asString());
+        }
+        assertEquals("Grabado", works.get(0).get("category").asString());
+        assertFalse(works.get(0).get("observation").asString().isBlank());
 
         assertEquals(400, request("POST", "exhibitions",
                 """

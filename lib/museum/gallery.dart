@@ -5,6 +5,7 @@ import 'collection_view.dart';
 import 'exhibition_editor.dart';
 import 'museum_api.dart';
 import 'night_art_card.dart';
+import 'print_archive.dart';
 
 class Gallery extends StatefulWidget {
   const Gallery({this.onExit, super.key});
@@ -20,6 +21,7 @@ class _GalleryState extends State<Gallery> {
   late var _collection = _api.artworks();
   late var _exhibitions = _api.exhibitions();
   final _saved = <int>{};
+  final _tickets = <String>{};
   int _tab = 0;
   bool _search = false;
 
@@ -129,6 +131,7 @@ class _GalleryState extends State<Gallery> {
                   CollectionView(
                     works,
                     onVisit: _visit,
+                    onTicket: (title) => setState(() => _tickets.add(title)),
                     saved: _saved,
                     onSave: _toggleSaved,
                     search: _search,
@@ -143,25 +146,57 @@ class _GalleryState extends State<Gallery> {
     },
   );
 
-  Widget _savedWorks(List<Artwork> works) => works.isEmpty
-      ? const Center(
-          child: Text('Guarda una obra para volver a ella durante la visita.'),
+  Widget _savedWorks(List<Artwork> works) => works.isEmpty && _tickets.isEmpty
+      ? EmptyArchive(
+          'Tu archivo de visita',
+          'Toca el marcador de una obra para conservarla durante esta visita.',
+          onExplore: () => setState(() => _tab = 0),
         )
-      : GridView.builder(
-          padding: const EdgeInsets.all(20),
-          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 290,
-            mainAxisExtent: 220,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-          ),
-          itemCount: works.length,
-          itemBuilder: (_, index) => NightArtCard(
-            works[index],
-            saved: true,
-            onOpen: () => _visit(works, index),
-            onSave: () => _toggleSaved(works[index].id),
-          ),
+      : Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+              child: ArchiveHeading("Guardados", count: works.length),
+            ),
+            if (_tickets.isNotEmpty)
+              SizedBox(
+                height: 72,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  children: [
+                    for (final ticket in _tickets)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Chip(
+                          avatar: const Icon(
+                            Icons.confirmation_number_outlined,
+                          ),
+                          label: Text(ticket),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            Expanded(
+              child: GridView.builder(
+                padding: const EdgeInsets.all(20),
+                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: 290,
+                  mainAxisExtent: 220,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
+                itemCount: works.length,
+                itemBuilder: (_, index) => NightArtCard(
+                  works[index],
+                  saved: true,
+                  onOpen: () => _visit(works, index),
+                  onSave: () => _toggleSaved(works[index].id),
+                ),
+              ),
+            ),
+          ],
         );
 
   Widget _rooms(List<Artwork> works) => FutureBuilder(
@@ -174,28 +209,45 @@ class _GalleryState extends State<Gallery> {
       if (rooms == null) {
         return _retry(
           () => setState(() => _exhibitions = _api.exhibitions()),
-          'No se pudieron cargar las exposiciones.',
+          'No se pudieron cargar los álbumes.',
         );
       }
       final byId = {for (final art in works) art.id: art};
       return ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          ArchiveHeading('Mis álbumes', count: rooms.length),
           FilledButton.icon(
             onPressed: () => _edit(works),
             icon: const Icon(Icons.add),
-            label: const Text('Nueva exposición'),
+            label: const Text('Nuevo álbum'),
           ),
           if (rooms.isEmpty)
             const Padding(
               padding: EdgeInsets.all(24),
               child: Text(
-                'Elige obras de la colección para crear tu primera sala.',
+                'Elige obras de la colección para crear tu primer álbum.',
               ),
             ),
           for (final room in rooms)
             ListTile(
-              title: Text(room.title),
+              contentPadding: const EdgeInsets.symmetric(vertical: 8),
+              leading:
+                  room.artworkIds.isNotEmpty &&
+                      byId[room.artworkIds.first] != null
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: SizedBox(
+                        width: 54,
+                        height: 54,
+                        child: ArtworkImage(byId[room.artworkIds.first]!),
+                      ),
+                    )
+                  : const Icon(Icons.collections),
+              title: Text(
+                room.title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               subtitle: Text('${room.artworkIds.length} obras'),
               onTap: () {
                 final selection = room.artworkIds
@@ -205,7 +257,7 @@ class _GalleryState extends State<Gallery> {
                 if (selection.isNotEmpty) _visit(selection, 0);
               },
               trailing: IconButton(
-                tooltip: 'Editar exposición',
+                tooltip: 'Editar álbum',
                 icon: const Icon(Icons.edit_outlined),
                 onPressed: () => _edit(works, room),
               ),

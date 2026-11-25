@@ -11,10 +11,18 @@ class Artwork {
       title = json['title'] as String,
       artist = json['artist'] as String,
       period = json['period'] as String,
-      imageUrl = json['imageUrl'] as String;
+      imageUrl = json['imageUrl'] as String,
+      imageAsset =
+          json['imageAsset'] as String? ??
+          ((json['imageUrl'] as String).startsWith('assets/')
+              ? json['imageUrl'] as String
+              : null),
+      category = json['category'] as String? ?? 'Pintura',
+      observation = json['observation'] as String? ?? '';
 
   final int id;
-  final String title, artist, period, imageUrl;
+  final String title, artist, period, imageUrl, category, observation;
+  final String? imageAsset;
 }
 
 class Exhibition {

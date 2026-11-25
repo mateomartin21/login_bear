@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'curated_routes.dart';
 import 'museum_api.dart';
 import 'night_art_card.dart';
 
@@ -7,6 +8,7 @@ class CollectionView extends StatefulWidget {
   const CollectionView(
     this.works, {
     required this.onVisit,
+    required this.onTicket,
     required this.saved,
     required this.onSave,
     required this.search,
@@ -17,6 +19,7 @@ class CollectionView extends StatefulWidget {
   final Set<int> saved;
   final ValueChanged<int> onSave;
   final void Function(List<Artwork>, int) onVisit;
+  final ValueChanged<String> onTicket;
   final bool search;
 
   @override
@@ -24,7 +27,7 @@ class CollectionView extends StatefulWidget {
 }
 
 class _CollectionViewState extends State<CollectionView> {
-  static const _filters = ['Para ti', 'Van Gogh', 'Otros artistas'];
+  static const _filters = ['Todos', 'Pintura', 'Grabado', 'Textil', 'Objetos'];
   final _searchFocus = FocusNode();
   String _query = '';
   int _filter = 0;
@@ -47,11 +50,10 @@ class _CollectionViewState extends State<CollectionView> {
   }
 
   List<Artwork> get _visible => widget.works.where((work) {
-    final vanGogh = work.artist == 'Vincent van Gogh';
-    return (_filter == 0 || (_filter == 1 ? vanGogh : !vanGogh)) &&
-        '${work.title} ${work.artist} ${work.period}'.toLowerCase().contains(
-          _query,
-        );
+    return (_filter == 0 || work.category == _filters[_filter]) &&
+        '${work.title} ${work.artist} ${work.period} ${work.category}'
+            .toLowerCase()
+            .contains(_query);
   }).toList();
 
   @override
@@ -78,7 +80,7 @@ class _CollectionViewState extends State<CollectionView> {
                         onChanged: (value) =>
                             setState(() => _query = value.trim().toLowerCase()),
                         decoration: const InputDecoration(
-                          labelText: 'Busca por obra, artista o año',
+                          labelText: 'Busca por obra, artista o técnica',
                           prefixIcon: Icon(Icons.search),
                           border: OutlineInputBorder(),
                         ),
@@ -178,11 +180,17 @@ class _CollectionViewState extends State<CollectionView> {
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 12),
                 sliver: SliverToBoxAdapter(
+                  child: !widget.search && _filter == 0
+                      ? CuratedRoutes(widget.works, onTicket: widget.onTicket)
+                      : const SizedBox.shrink(),
+                ),
+              ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                sliver: SliverToBoxAdapter(
                   child: Text.rich(
                     TextSpan(
-                      text: widget.search
-                          ? 'Resultados'
-                          : 'Tu siguiente desvelo  ',
+                      text: widget.search ? 'Resultados' : 'Colección  ',
                       children: const [
                         TextSpan(
                           text: '//',

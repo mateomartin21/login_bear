@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'museum_api.dart';
+import 'artwork_view.dart';
+import 'print_archive.dart';
 
 class ExhibitionEditor extends StatefulWidget {
   const ExhibitionEditor(this.api, this.works, this.exhibition, {super.key});
@@ -54,7 +56,7 @@ class _ExhibitionEditorState extends State<ExhibitionEditor> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('¿Borrar exposición?'),
+        title: const Text('¿Borrar álbum?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -79,13 +81,13 @@ class _ExhibitionEditorState extends State<ExhibitionEditor> {
         appBar: AppBar(
           title: Text(
             widget.exhibition == null
-                ? 'Nueva exposición'
-                : 'Editar exposición',
+                ? 'Nuevo álbum'
+                : 'Editar álbum',
           ),
           actions: [
             if (widget.exhibition != null)
               IconButton(
-                tooltip: 'Borrar exposición',
+                tooltip: 'Borrar álbum',
                 onPressed: _busy ? null : _confirmDelete,
                 icon: const Icon(Icons.delete_outline),
               ),
@@ -98,7 +100,7 @@ class _ExhibitionEditorState extends State<ExhibitionEditor> {
               controller: _title,
               enabled: !_busy,
               maxLength: 100,
-              decoration: const InputDecoration(labelText: 'Título de la sala'),
+              decoration: const InputDecoration(labelText: 'Título del álbum'),
             ),
             const SizedBox(height: 12),
             if (_selected.isNotEmpty) ...[
@@ -121,9 +123,14 @@ class _ExhibitionEditorState extends State<ExhibitionEditor> {
                   ),
                 ),
             ],
-            const Text('Obras disponibles'),
+            ArchiveHeading('Seleccionar obras', count: widget.works.length),
             for (final art in widget.works)
               CheckboxListTile(
+                secondary: SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: ArtworkImage(art),
+                ),
                 value: _selected.contains(art.id),
                 title: Text(art.title),
                 onChanged: _busy
@@ -142,7 +149,7 @@ class _ExhibitionEditorState extends State<ExhibitionEditor> {
           minimum: const EdgeInsets.all(20),
           child: FilledButton(
             onPressed: _busy ? null : _submit,
-            child: Text(_busy ? 'Procesando…' : 'Guardar exposición'),
+            child: Text(_busy ? 'Procesando…' : 'Guardar álbum'),
           ),
         ),
       ),

@@ -19,7 +19,8 @@ import tools.jackson.databind.ObjectMapper;
 @RequestMapping("/api")
 @CrossOrigin(origins = {"http://localhost:7357", "http://127.0.0.1:7357"})
 public class MuseumController {
-    record Artwork(int id, String title, String artist, String period, String imageUrl, String sourceUrl) {}
+    record Artwork(int id, String title, String artist, String period, String imageUrl, String sourceUrl,
+                   String category, String observation, String imageAsset) {}
     record Exhibition(String id, String title, List<Integer> artworkIds) {}
     record Draft(String title, List<Integer> artworkIds) {}
 

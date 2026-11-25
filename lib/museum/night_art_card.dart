@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'artwork_view.dart';
 import 'museum_api.dart';
+import 'print_archive.dart';
 
 const nightLime = Color(0xffdcff13);
 const nightCoral = Color(0xffff665e);
@@ -95,10 +96,9 @@ class NightArtCard extends StatelessWidget {
               backgroundColor: const Color(0xdd131313),
             ),
             onPressed: onSave,
-            icon: Icon(
-              saved ? Icons.bookmark : Icons.bookmark_border,
-              color: saved ? nightLime : Colors.white,
-            ),
+            icon: saved
+                ? const PrintStamp(moving: true, size: 30)
+                : const Icon(Icons.bookmark_border, color: Colors.white),
           ),
         ),
       ],
