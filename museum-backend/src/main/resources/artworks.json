@@ -1,0 +1,134 @@
+[
+  {
+    "id": 45434,
+    "title": "La gran ola de Kanagawa",
+    "artist": "Katsushika Hokusai",
+    "period": "c. 1830–1832",
+    "category": "Grabado",
+    "observation": "Encuentra el monte Fuji bajo la cresta. Su forma repite la de la ola y la perspectiva lo vuelve diminuto.",
+    "imageUrl": "https://collectionapi.metmuseum.org/api/collection/v1/iiif/45434/134438/main-image",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/45434",
+    "imageAsset": "assets/met-45434.jpg"
+  },
+  {
+    "id": 437654,
+    "title": "Desfile de circo",
+    "artist": "Georges Seurat",
+    "period": "1887–1888",
+    "category": "Pintura",
+    "observation": "Busca las lámparas de gas en la parte superior. Bajo ellas, los músicos quedan reducidos a siluetas.",
+    "imageUrl": "https://collectionapi.metmuseum.org/api/collection/v1/iiif/437654/1652949/main-image",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/437654",
+    "imageAsset": "assets/met-437654.jpg"
+  },
+  {
+    "id": 544227,
+    "title": "Hipopótamo «William»",
+    "artist": "Egipto, Reino Medio",
+    "period": "c. 1961–1878 a. C.",
+    "category": "Objetos",
+    "observation": "Mira las plantas oscuras sobre el esmalte azul. Los lotos dibujan sobre el cuerpo del hipopótamo el entorno acuático del Nilo.",
+    "imageUrl": "https://collectionapi.metmuseum.org/api/collection/v1/iiif/544227/1216904/main-image",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/544227",
+    "imageAsset": "assets/met-544227.jpg"
+  },
+  {
+    "id": 467642,
+    "title": "El unicornio descansa en un jardín",
+    "artist": "Talleres franceses y neerlandeses",
+    "period": "1495–1505",
+    "category": "Textil",
+    "observation": "Busca la cerca circular y el granado. Fíjate en cómo las plantas cambian de escala según su lugar en el tapiz.",
+    "imageUrl": "https://collectionapi.metmuseum.org/api/collection/v1/iiif/467642/940931/main-image",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/467642",
+    "imageAsset": "assets/met-467642.jpg"
+  },
+  {
+    "id": 436535,
+    "imageUrl": "https://images.metmuseum.org/CRDImages/ep/web-large/DP-42549-001.jpg",
+    "title": "Wheat Field with Cypresses",
+    "artist": "Vincent van Gogh",
+    "period": "1889",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/436535",
+    "category": "Pintura",
+    "observation": "Sigue las pinceladas curvas en las nubes y compáralas con las del trigo. El cielo y la tierra parecen moverse al mismo ritmo.",
+    "imageAsset": "assets/met-436535.jpg"
+  },
+  {
+    "id": 436532,
+    "imageUrl": "https://images.metmuseum.org/CRDImages/ep/web-large/DT1502_cropped2.jpg",
+    "title": "Self-Portrait with a Straw Hat (obverse: The Potato Peeler)",
+    "artist": "Vincent van Gogh",
+    "period": "1887",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/436532",
+    "category": "Pintura",
+    "observation": "Busca los toques azules y verdes en el rostro. Aléjate un poco y observa cómo se funden con los naranjas.",
+    "imageAsset": "assets/met-436532.jpg"
+  },
+  {
+    "id": 436524,
+    "imageUrl": "https://images.metmuseum.org/CRDImages/ep/web-large/DP-41223-001.jpg",
+    "title": "Sunflowers",
+    "artist": "Vincent van Gogh",
+    "period": "1887",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/436524",
+    "category": "Pintura",
+    "observation": "Compara los centros de los girasoles. Algunos discos están abiertos y otros ya se deshacen; el ramo marca el paso del tiempo.",
+    "imageAsset": "assets/met-436524.jpg"
+  },
+  {
+    "id": 438821,
+    "imageUrl": "https://images.metmuseum.org/CRDImages/ep/web-large/DT1025.jpg",
+    "title": "Ia Orana Maria (Hail Mary)",
+    "artist": "Paul Gauguin",
+    "period": "1891",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/438821",
+    "category": "Pintura",
+    "observation": "Mira los halos en medio de la vegetación. Gauguin trasladó una escena cristiana a un paisaje de Tahití.",
+    "imageAsset": "assets/met-438821.jpg"
+  },
+  {
+    "id": 437394,
+    "imageUrl": "https://images.metmuseum.org/CRDImages/ep/web-large/DP-30758-001.jpg",
+    "title": "Aristotle with a Bust of Homer",
+    "artist": "Rembrandt (Rembrandt van Rijn)",
+    "period": "1653",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/437394",
+    "category": "Pintura",
+    "observation": "Localiza la cadena dorada y la mano iluminada sobre el busto. Sigue después la luz hasta el rostro de Aristóteles.",
+    "imageAsset": "assets/met-437394.jpg"
+  },
+  {
+    "id": 436528,
+    "imageUrl": "https://images.metmuseum.org/CRDImages/ep/web-large/DP346474.jpg",
+    "title": "Irises",
+    "artist": "Vincent van Gogh",
+    "period": "1890",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/436528",
+    "category": "Pintura",
+    "observation": "Busca el iris más claro entre los violetas. El contraste hace que parezca avanzar hacia ti.",
+    "imageAsset": "assets/met-436528.jpg"
+  },
+  {
+    "id": 436121,
+    "title": "Mujer sentada junto a un jarrón de flores",
+    "artist": "Edgar Degas",
+    "period": "1865",
+    "category": "Pintura",
+    "observation": "El ramo ocupa el centro y la figura aparece cortada en el borde. Fíjate adónde va primero tu mirada.",
+    "imageUrl": "https://collectionapi.metmuseum.org/api/collection/v1/iiif/436121/2175914/main-image",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/436121",
+    "imageAsset": "assets/met-436121.jpg"
+  },
+  {
+    "id": 248909,
+    "title": "Placa funeraria de terracota",
+    "artist": "Grecia, Ática",
+    "period": "Finales del siglo VII a. C.",
+    "category": "Objetos",
+    "observation": "Recorre las siluetas de quienes rodean el lecho. Compara la posición de sus manos y brazos.",
+    "imageUrl": "https://collectionapi.metmuseum.org/api/collection/v1/iiif/248909/1891011/main-image",
+    "sourceUrl": "https://www.metmuseum.org/art/collection/search/248909",
+    "imageAsset": "assets/met-248909.jpg"
+  }
+]
